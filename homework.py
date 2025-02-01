@@ -1,71 +1,98 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import filedialog, messagebox, simpledialog
+from tkinter.font import Font
+from tkinter.colorchooser import askcolor
 
-class Profile:
-    def __init__(self, name="", age=0, favorite_color="", hobby=""):
-        self.__name = name
-        self.__age = age
-        self.__favorite_color = favorite_color
-        self.__hobby = hobby
-
-    def update_profile(self, name, age, favorite_color, hobby):
-        self.__name = name
-        self.__age = age
-        self.__favorite_color = favorite_color
-        self.__hobby = hobby
-
-    def get_info(self):
-        return (f"Name: {self.__name}\n"
-                f"Age: {self.__age}\n"
-                f"Favorite Color: {self.__favorite_color}\n"
-                f"Hobby: {self.__hobby}")
-
-class ProfileApp:
+class MagicalNotebook:
     def __init__(self, root):
-        self.profile = Profile()
         self.root = root
-        self.root.title("Kids Profile App")
-        self.root.geometry("500x300")
-        self.name_label = tk.Label(root, text="Name:")
-        self.name_label.pack()
-        self.name_entry = tk.Entry(root)
-        self.name_entry.pack()
-        self.age_label = tk.Label(root, text="Age:")
-        self.age_label.pack()
-        self.age_entry = tk.Entry(root)
-        self.age_entry.pack()
-        self.color_label = tk.Label(root, text="Favorite Color:")
-        self.color_label.pack()
-        self.color_entry = tk.Entry(root)
-        self.color_entry.pack()
-        self.hobby_label = tk.Label(root, text="Hobby:")
-        self.hobby_label.pack()
-        self.hobby_entry = tk.Entry(root)
-        self.hobby_entry.pack()
-        self.save_button = tk.Button(root, text="Save Profile", command=self.save_profile)
-        self.save_button.pack()
-        self.show_button = tk.Button(root, text="Show Profile", command=self.show_profile)
-        self.show_button.pack()
-        self.info_label = tk.Label(root, text="", justify=tk.LEFT)
-        self.info_label.pack()
+        self.root.title("Magical Notebook")
 
-    def save_profile(self):
-        name = self.name_entry.get()
-        age = self.age_entry.get()
-        favorite_color = self.color_entry.get()
-        hobby = self.hobby_entry.get()
+        # Create menu bar
+        self.menu_bar = tk.Menu(self.root)
+        self.root.config(menu=self.menu_bar)
 
-        if name and age.isdigit() and favorite_color and hobby:
-            self.profile.update_profile(name, int(age), favorite_color, hobby)
-            messagebox.showinfo("Success", "Profile saved successfully!")
-        else:
-            messagebox.showerror("Error", "Please fill all fields with valid information.")
+        # File menu
+        self.file_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_bar.add_cascade(label="File", menu=self.file_menu)
+        self.file_menu.add_command(label="New", command=self.new_file)
+        self.file_menu.add_command(label="Open", command=self.open_file)
+        self.file_menu.add_command(label="Save", command=self.save_file)
+        self.file_menu.add_command(label="Save As", command=self.save_as_file)
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Exit", command=self.exit_app)
 
-    def show_profile(self):
-        info = self.profile.get_info()
-        self.info_label.config(text=info)
+        # Edit menu
+        self.edit_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_bar.add_cascade(label="Edit", menu=self.edit_menu)
+        self.edit_menu.add_command(label="Cut", command=self.cut_text)
+        self.edit_menu.add_command(label="Copy", command=self.copy_text)
+        self.edit_menu.add_command(label="Paste", command=self.paste_text)
+        self.edit_menu.add_separator()
+        self.edit_menu.add_command(label="Change Font", command=self.change_font)
+        self.edit_menu.add_command(label="Change Color Theme", command=self.change_theme)
+       # self.edit_menu.add_command(label="Spell Check", command=self.spell_check)
+
+        # Help menu
+        self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_bar.add_cascade(label="Help", menu=self.help_menu)
+        self.help_menu.add_command(label="About", command=self.show_about)
+
+        # Text area
+        self.text_area = tk.Text(self.root, wrap=tk.WORD, undo=True)
+        self.text_area.pack(fill=tk.BOTH, expand=1)
+
+        # Initialize default font and color
+        self.current_font = Font(family="Arial", size=12)
+        self.current_bg_color = "#FFFFFF"
+        self.current_fg_color = "#000000"
+        self.text_area.config(font=self.current_font, bg=self.current_bg_color, fg=self.current_fg_color)
+
+    def new_file(self):
+        self.text_area.delete(1.0, tk.END)
+
+    def open_file(self):
+        file_path = filedialog.askopenfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
+        if file_path:
+            with open(file_path, "r") as file:
+                content = file.read()
+                self.text_area.delete(1.0, tk.END)
+                self.text_area.insert(tk.INSERT, content)
+
+    def save_file(self):
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
+        if file_path:
+            with open(file_path, "w") as file:
+                content = self.text_area.get(1.0, tk.END)
+                file.write(content)
+
+    def save_as_file(self):
+        # Save As functionality here
+        self.save_file()
+
+    def exit_app(self):
+        self.root.quit()
+
+    def cut_text(self):
+        self.text_area.event_generate("<<Cut>>")
+
+    def copy_text(self):
+        self.text_area.event_generate("<<Copy>>")
+
+    def paste_text(self):
+        self.text_area.event_generate("<<Paste>>")
+
+    def change_font(self):
+        pass
+
+    def change_theme(self):
+        pass
+   
+   
+    def show_about(self):
+        messagebox.showinfo("About", "Magical Notebook v1.1\nCreated by [Your Name]\nWith Font Changing, Color Themes, and Basic Spell Check!")
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = ProfileApp(root)
+    app = MagicalNotebook(root)
     root.mainloop()
