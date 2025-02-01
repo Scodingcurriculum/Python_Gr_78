@@ -1,0 +1,25 @@
+from tkinter import *
+from PIL import Image, ImageTk
+root=Tk()
+root.title("Identify the Super Heroes!")
+root.geometry("500x500")
+# Add image label
+image_label = Label(root)
+image_label.pack()
+#Add entry to write the image name
+e=Entry(root)
+e.pack()
+#Add label to display the status 
+lstat=Label(root)
+lstat.pack()
+#Add button to chek the image name
+btn_check=Button(root,text="CHECK",command=check)
+btn_check.pack()
+# Add buttons to navigate through images
+prev_button = Button(root, text="<<", command=show_prev_image)
+prev_button.pack(side=LEFT)
+next_button = Button(root, text=">>", command=show_next_image)
+next_button.pack(side=RIGHT)
+# Start the Tkinter main loop
+root.mainloop()
+
